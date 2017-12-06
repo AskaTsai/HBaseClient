@@ -3,7 +3,9 @@ package com.sselab;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.*;
 import org.apache.hadoop.hbase.client.*;
+import org.apache.hadoop.hbase.coprocessor.CoprocessorService;
 import org.apache.hadoop.hbase.util.Bytes;
+import org.apache.hadoop.ipc.ProtocolSignature;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -19,9 +21,11 @@ public class HBaseDemo {
 
     @Before
     public void init() {
+        logger.info("USER.DIR=" +System.getProperty("user.dir"));
         conf = HBaseConfiguration.create();
         conf.set("hbase.zookeeper.property.clientPort", "2181");
-        conf.set("hbase.zookeeper.quorum","tmphmaster,tmpslave,tmpslave2");
+//        conf.set("hbase.zookeeper.quorum", "tmphmaster,tmpslave,tmpslave2");
+        conf.set("hbase.zookeeper.quorum", "master,slave1,slave2");
         try {
             conn = ConnectionFactory.createConnection(conf);
         } catch (IOException e) {
@@ -50,9 +54,10 @@ public class HBaseDemo {
         HTable table = (HTable) conn.getTable(TableName.valueOf("people"));
 
         Put put = new Put(Bytes.toBytes("rk0001"));
-        put.addColumn(Bytes.toBytes("info"), Bytes.toBytes("name" ), Bytes.toBytes("zhangsan" ));
+        put.addColumn(Bytes.toBytes("info"), Bytes.toBytes("name" ), Bytes.toBytes("wangmeng" ));
         put.addColumn(Bytes.toBytes("info"), Bytes.toBytes("age" ), Bytes.toBytes("25" ));
         put.addColumn(Bytes.toBytes("info"), Bytes.toBytes("money" ), Bytes.toBytes("10w" ));
+        put.addColumn(Bytes.toBytes("info"),Bytes.toBytes("id" ), Bytes.toBytes(1024 ));
         table.put(put);
     }
     @Test
@@ -120,5 +125,10 @@ public class HBaseDemo {
             deleteList.add(delete);
         }
         table.delete(deleteList);
+    }
+    @Test
+    public void test(){
+        CoprocessorService co;
+        ProtocolSignature signature;
     }
 }
